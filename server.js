@@ -7,13 +7,8 @@ dotenv.config();
 
 const app = express();
 
-// ===== DEBUG ENV CHECK =====
-console.log("ENV CHECK");
-console.log("PORT:", process.env.PORT);
-console.log("MONGO_URI exists:", !!process.env.MONGO_URI);
-console.log("JWT_SECRET exists:", !!process.env.JWT_SECRET);
-
 // ===== CONNECT DATABASE =====
+// In serverless environments, we connect once and reuse the connection
 connectDB();
 
 // ===== MIDDLEWARE =====
@@ -35,9 +30,16 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// ===== START SERVER =====
-const PORT = process.env.PORT || 5000;
+// ===== START SERVER (FOR LOCAL DEV) =====
+// Vercel handles the listening part in production. 
+// We only call app.listen() if we are running the file directly locally.
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// ===== EXPORT FOR VERCEL =====
+// This is the most important line for Vercel!
+module.exports = app;
