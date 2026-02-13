@@ -8,7 +8,6 @@ dotenv.config();
 
 const app = express();
 
-// ===== MIDDLEWARE =====
 app.use(cors());
 app.use(express.json());
 
@@ -22,9 +21,8 @@ app.use('/api/gpt', require('./src/routes/gptRoutes'));
 // ===== 404 HANDLER =====
 app.use((req, res) => res.status(404).json({ message: 'Route not found' }));
 
-// ===== START SERVER (LOCAL DEV ONLY) =====
+// ===== LOCAL DEV =====
 if (process.env.NODE_ENV !== 'production') {
-  // Connect DB once for local dev
   connectDB().then(() => {
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
